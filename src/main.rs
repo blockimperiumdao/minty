@@ -34,97 +34,38 @@ fn minty( filename: &String, account_id: &String ) -> Result<(), Box<dyn Error>>
 
         let mut record: NFTRecord = result?;
 
+        // ensure the royalty pct is in the format required by paras
+        //
         record.royalty_pct = record.royalty_pct * 1000;
 
-        println!("{:?}", record);
+        //println!("{:?}", record);
 
-        let test = r#"'{"creator_id":"afrorick.testnet","token_metadata":{"title":"AfroRick","media":"bafybeid7ztbmhjx3266jm6fyoaft7xvwup2ex2da2odjvfl4s4pvxvgjni","copies":1},"price":"1000000000000000000000000","royalty":{"afrorick.testnet":1000}}' --depositYocto 8540000000000000000000"#;
 
 
         let price = record.price as u32;
         let copies = record.copies as u32;
-        let mut token_metadata = json::JsonValue::new_object();
-        token_metadata["title"] = record.title.into();
-        token_metadata["media"] = record.media.into();
-        token_metadata["reference"] = record.media_hash.into();
-        token_metadata["copies"] = copies.into();
-
-        let mut data = json::JsonValue::new_object();
-        data["creator_id"] = account_id.to_string().into();
-        data["token_metadata"] = token_metadata.to_string().into();
-        data["price"] = price.into();
-
-        println!("{:?}", data.dump());
+        let title = record.title;
+        let media = record.media;
+        let royalty_act = record.royalty_account;
+        let royalty_pct = record.royalty_pct;
 
 
-        // let output = if cfg!(target_os = "windows")
-        // {
-        //     Command::new("cmd")
-        //                 .arg("near")
-        //                 .arg("call")
-        //                 .output()
-        //                 .expect("Failed to execute command")
-        // }
-        // else 
-        // {
-        //     println!("Running the unix command...");
-        //     // Command::new("/bin/sh")
-        //     //             .arg("-c")
-        //     //             .arg("near")
-        //     //             .arg("call")
-        //     //             .arg("--accountId")
-        //     //             .arg(account_id)
-        //     //             .arg("paras-token-v2.testnet")
-        //     //             .arg("nft_create_series")
-        //     //             .arg( data.dump() )
-        //     //             .output()
-        //     //             .expect("Failed to execute command")
-        //     //Command::new("sh").arg("-C").arg("near call --accountId afrorick.testnet paras-token-v2.testnet nft_create_series").output().expect("Failed")
-        //     Command::new("/bin/sh")
-        //         .args(&["-c"])
-        //         .spawn()
+        let test = r#"'{"creator_id":"afrorick.testnet","token_metadata":{"title":"AfroRick","media":"bafybeid7ztbmhjx3266jm6fyoaft7xvwup2ex2da2odjvfl4s4pvxvgjni","copies":1},"price":"1000000000000000000000000","royalty":{"afrorick.testnet":1000}}' --depositYocto 8540000000000000000000"#;
 
-        // };
+        let token_medatada = format!(r#"{{"creator_id": "{account_id}","token_metadata": {{"title":"{title}","media":"{media}", "copies": {copies} }}, "price": "{price}", "royalty": {{"{royalty_act}": {royalty_pct} }} }}"#);
 
-        // let output = Command::new("/bin/sh")
-        //     .args(&["-c","near","call","--accountId afrorick.testnet", "paras-token-v2.testnet"])
-        //     .output()
-        //     .expect("Failed to execute command");
 
-        // let output = Command::new("near")
-        // .args(&["state","afrorick.testnet"])
-        // .output()
-        // .expect("Failed to execute command");        
+        println!( "Sending metadata : {}", token_medatada );
 
         let output = Command::new("near")
-        .args(&["call","--accountId",account_id,"paras-token-v2.testnet","nft_create_series", &test])
+        .args(&["call","--accountId",account_id,"paras-token-v2.testnet","nft_create_series", &token_medatada, "--depositYocto",  "8540000000000000000000"])
         .output()
         .expect("Failed to execute command"); 
 
-        //println!("{:?}", output);
-        //println!("Status: {}", output.);
         println!("Output: {}", String::from_utf8_lossy(&output.stdout));
-        println!("Error: {}", String::from_utf8_lossy(&output.stderr));
-
-
-        //TODO: We need to deserialize the StringRecord somehow.
-
-        // Notice that we need to provide a type hint for automatic
-        // deserialization.
-        // let record: NFTRecord = result?;
-        // println!("{:?}", record);
-        // let record = result?;
-        // record.deserialize(NFTRecord);
-
-        // StringRecord.deserialize(headers: Option<&'de StringRecord>)
+        println!("Error: {}", String::from_utf8_lossy(&output.stderr));        
     }
 
-    // // deserialize each of the records in the CSV into its own NFTRecord struct
-    // for result in rdr.deserialize() 
-    // {
-
- 
-    // }
     Ok(())
 }
 
