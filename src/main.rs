@@ -3,11 +3,14 @@ use std::io;
 use std::fs;
 use std::process;
 use std::env;
+use log::info;
 
 use std::process::Command;
 
 use serde::Deserialize;
 use serde::Serialize;
+
+const CARGO_PKG_VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
 
 #[derive(Debug, Serialize, Deserialize)]
 struct NFTRecord {
@@ -22,8 +25,8 @@ struct NFTRecord {
     royalty_pct: u16,
 }
 
-fn minty( filename: &String, account_id: &String ) -> Result<(), Box<dyn Error>> {
-
+fn minty( filename: &String, account_id: &String ) -> Result<(), Box<dyn Error>> 
+{
     let mut rdr = csv::Reader::from_path(filename)?;
     let headers = rdr.headers()?;
     println!("Headers {:?}", headers);
@@ -71,7 +74,7 @@ fn minty( filename: &String, account_id: &String ) -> Result<(), Box<dyn Error>>
 
 fn main() {
 
-
+    println!("Minty... VERSION={}", CARGO_PKG_VERSION.unwrap_or("NOT_FOUND"));
 
     let args: Vec<String> = env::args().collect();
     println!("{:?}", args);
