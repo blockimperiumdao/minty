@@ -21,8 +21,17 @@ minty foo.csv afrorick.testnet
 Minty expects the CSV to conform to the following format. Each should be a column:
 
 - title : string - the title of the artwork. If more than one copy, paras will append the copy number to this
+- description: string - description of the series/content.
 - media : string that is the IPFS ID for the artwork
+- media_hash: string - if using a URL for media, this is the base64 hash that represents it
 - copies: number - the number of them you want published
+- extra: string - json representing extra data (untested)
 - price: number - number of near this costs
-- royal_act: string - the account that will be paid royalties when this asset is sold
+- royalty_account: string - the account that will be paid royalties when this asset is sold
 - royalty_pct: number - the pct royalty to be paid (keep this a whole number - no decimals)
+
+Sample CSV Snippet (yes, the header is necessary)
+```
+title,description,media,media_hash,copies,extra,price,royalty_account,royalty_pct
+AfroRick Publish Run,This is a test of a full publish from the tool,bafybeid7ztbmhjx3266jm6fyoaft7xvwup2ex2da2odjvfl4s4pvxvgjni,,22,,10000,afrorick.testnet,7
+```
