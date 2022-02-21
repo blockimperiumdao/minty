@@ -53,7 +53,9 @@ struct PublishOptions
 fn minty( publish_options: PublishOptions ) -> Result<(), Box<dyn Error>> 
 {
 
-    let mut rdr = csv::Reader::from_path(&publish_options.csv_file)?;
+    let mut rdr = csv::ReaderBuilder::new()
+                        .delimiter(b'|')
+                        .from_path(&publish_options.csv_file)?;
     let headers = rdr.headers()?;
     println!("Headers {:?}", headers);
 
