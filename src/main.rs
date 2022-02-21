@@ -1,16 +1,33 @@
 use std::error::Error;
-use std::io;
-use std::fs;
+//use std::io;
+//use std::fs;
 use std::process;
-use std::env;
-use log::info;
+//use std::env;
+//use log::info;
 
 use std::process::Command;
 
 use serde::Deserialize;
 use serde::Serialize;
 
+use clap::Parser;
+
 const CARGO_PKG_VERSION: Option<&'static str> = option_env!("CARGO_PKG_VERSION");
+
+#[derive(Parser)]
+#[clap(author, version, about, long_about = None)]
+struct Cli {
+    /// Name of the person to greet
+    #[clap(short = 'F', long)]
+    csv_file: Option<String>,
+
+    #[clap(short = 'A', long)]
+    account_id: Option<String>,
+
+    #[clap(short = 'T', long)]
+    publish_target: Option<String>
+}
+
 
 #[derive(Debug, Serialize, Deserialize)]
 struct NFTRecord 
@@ -35,22 +52,14 @@ struct PublishOptions
 
 fn minty( publish_options: PublishOptions ) -> Result<(), Box<dyn Error>> 
 {
-    let mut publish_target = String::from("");
-
-    if publish_options.publish_target.trim().is_empty()
-    {
-        publish_target = "paras-token-v2.testnet".to_string();
-    }
-    else
-    {
-        publish_target = publish_options.publish_target;        
-    }
 
     let mut rdr = csv::Reader::from_path(&publish_options.csv_file)?;
     let headers = rdr.headers()?;
     println!("Headers {:?}", headers);
 
     let account_id = publish_options.account_id;
+    let publish_target = publish_options.publish_target;
+
 
     for result in rdr.deserialize() 
     {
@@ -95,27 +104,22 @@ fn main()
 
     println!("Minty... VERSION={}", CARGO_PKG_VERSION.unwrap_or("NOT_FOUND"));
 
-    let args: Vec<String> = env::args().collect();
-    println!("{:?}", args);
+    let args = Cli::parse();
+
+    //let args: Vec<String> = env::args().collect();
+    //println!("{:?}", args);
     
 
     let mut publish_options = PublishOptions { csv_file: "".to_string(), 
                                                 account_id: "".to_string(), 
                                                 publish_target: "".to_string() };
-    publish_options.csv_file = String::from(&args[1]);
-    publish_options.account_id = String::from(&args[2]);
+    publish_options.csv_file = args.csv_file.expect("You must specify a file name");
+    publish_options.account_id = args.account_id.expect("You must specify the account you are publishing to.");
+    publish_options.publish_target = args.publish_target.unwrap_or("paras-token-v2.testnet".to_string());
 
     println!("Loading file {}", publish_options.csv_file);
     println!("Using account {}", publish_options.account_id);
-
-
-
-    if args.len() == 4
-    {
-        publish_options.publish_target = String::from(&args[3]);
-
-        println!("Publishing to network {}", publish_options.publish_target);
-    }
+    println!("Publishing to {}", publish_options.publish_target);
 
     if let Err(err) = minty( publish_options ) 
     {
