@@ -30,7 +30,7 @@ Minty expects the CSV to conform to the following format. Each should be a colum
 - royalty_account: string - the account that will be paid royalties when this asset is sold
 - royalty_pct: number - the pct royalty to be paid (keep this a whole number - no decimals)
 
-Sample CSV Snippet (yes, the header is necessary)
+Sample CSV Snippet (yes, the header is necessary - no you can't change the order of the fields)
 ```
 title,description,media,media_hash,copies,extra,price,royalty_account,royalty_pct
 AfroRick Publish Run,This is a test of a full publish from the tool,bafybeid7ztbmhjx3266jm6fyoaft7xvwup2ex2da2odjvfl4s4pvxvgjni,,22,,10000,afrorick.testnet,7
