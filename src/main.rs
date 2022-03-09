@@ -84,7 +84,10 @@ fn minty( publish_options: PublishOptions ) -> Result<(), Box<dyn Error>>
 
         //let test = r#"'{"creator_id":"afrorick.testnet","token_metadata":{"title":"AfroRick","media":"bafybeid7ztbmhjx3266jm6fyoaft7xvwup2ex2da2odjvfl4s4pvxvgjni","copies":1},"price":"1000000000000000000000000","royalty":{"afrorick.testnet":1000}}' --depositYocto 8540000000000000000000"#;
 
-        let token_medatada = format!(r#"{{"creator_id": "{account_id}","token_metadata": {{"title":"{title}","media":"{media}", "copies": {copies} }}, "price": "{price}", "royalty": {{"{royalty_act}": {royalty_pct} }} }}"#);
+        let token_medatada = format!(r#"{{"creator_id": "{account_id}","token_metadata": {{"title":"{title}","media":"{media}", "copies": {copies}, "attributes": [                        {
+            "trait_type": "background",
+            "value": "spring_sunny_day"
+        },] }}, "price": "{price}", "royalty": {{"{royalty_act}": {royalty_pct} }} }}"#);
 
 
         println!( "Sending metadata : {}", token_medatada );
